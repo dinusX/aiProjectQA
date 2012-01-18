@@ -53,6 +53,14 @@ public class Question
     public void setFocus(String focus) {
         this.focus = focus;
     }
+    
+    public String getFocus() {
+        return focus;
+    }
+
+    public String[] getKeywords() {
+        return keywords;
+    }
 
 //    public void setKeywords(ArrayList keywords) {
 //        this.keywords = new String[keywords.size()];
