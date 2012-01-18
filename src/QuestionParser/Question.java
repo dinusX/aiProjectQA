@@ -5,6 +5,8 @@
 
 package QuestionParser;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author Dinu
@@ -16,6 +18,10 @@ public class Question
     private String questionType = "FACTOID";
     private String answerType = "OTHER";
     private String originalText = "";
+    
+    private String[] keywords=null;
+    private String focus = "";
+
     public Question(String text)
     {
         originalText = text;
@@ -44,4 +50,36 @@ public class Question
         this.questionType = questionType;
     }
 
+    public void setFocus(String focus) {
+        this.focus = focus;
+    }
+
+//    public void setKeywords(ArrayList keywords) {
+//        this.keywords = new String[keywords.size()];
+//        keywords.toArray(this.keywords);
+//    }
+    public void setKeywords(String[] keywords) {
+        this.keywords = keywords;
+    }
+    
+
+   
+    
+    @Override
+    public String toString()
+    {
+        StringBuilder string = new StringBuilder();
+        string.append("Original question: " + originalText + "\n");
+        string.append("QuestionType: " + questionType + "\n");
+        string.append("AnswerType: " + answerType + "\n");
+        string.append("Focus: " + focus + "\n");
+        string.append("Keywords: ");
+        for(String word : keywords)
+        {
+            string.append(word + " ");
+        }
+        
+        string.append("\n");
+        return string.toString();
+    }
 }
