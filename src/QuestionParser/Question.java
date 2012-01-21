@@ -14,19 +14,37 @@ import java.util.ArrayList;
 public class Question
 {
 
-
-    private String questionType = "FACTOID";
-    private String answerType = "OTHER";
+    private Multiplicity multiplicity = Multiplicity.UNKNOWN;
+    
+//    private String questionType = "FACTOID";
+    private AnswerType answerType = AnswerType.OTHER;
     private String originalText = "";
     
     private String[] keywords=null;
-    private String focus = "";
+    private ArrayList<FocusType> focusTypes = new ArrayList<FocusType>();
+    private ArrayList<String> mainObjects = new ArrayList<String>();
+
+    
+    public void addMainObject(String mainObject) {
+        this.mainObjects.add(mainObject);
+    }
+
+//    public ArrayList<String> getMainWords() {
+//        return mainWords;
+//    }
+    
+    public void addFocusType(FocusType focus) {
+        focusTypes.add(focus);
+    }
+    
+//    private String focus = "";
 
     public Question(String text)
     {
         originalText = text;
     }
-        public String getAnswerType() {
+        
+    public AnswerType getAnswerType() {
         return answerType;
     }
 
@@ -34,11 +52,11 @@ public class Question
         return originalText;
     }
 
-    public String getQuestionType() {
-        return questionType;
-    }
+//    public String getQuestionType() {
+//        return questionType;
+//    }
 
-    public void setAnswerType(String answerType) {
+    public void setAnswerType(AnswerType answerType) {
         this.answerType = answerType;
     }
 
@@ -46,17 +64,17 @@ public class Question
         this.originalText = originalText;
     }
 
-    public void setQuestionType(String questionType) {
-        this.questionType = questionType;
-    }
-
-    public void setFocus(String focus) {
-        this.focus = focus;
-    }
+//    public void setQuestionType(String questionType) {
+//        this.questionType = questionType;
+//    }
+//
+//    public void setFocus(String focus) {
+//        this.focus = focus;
+//    }
     
-    public String getFocus() {
-        return focus;
-    }
+//    public String getFocus() {
+//        return focus;
+//    }
 
     public String[] getKeywords() {
         return keywords;
@@ -70,24 +88,54 @@ public class Question
         this.keywords = keywords;
     }
     
+    
+    public void setMulitplicity(Multiplicity multiplicity)
+    {
+        this.multiplicity = multiplicity;
+    }
 
+    public Multiplicity getMulitplicity() {
+        return this.multiplicity;
+    }
    
     
     @Override
     public String toString()
     {
         StringBuilder string = new StringBuilder();
-        string.append("Original question: " + originalText + "\n");
-        string.append("QuestionType: " + questionType + "\n");
+        string.append("Original question: ");
+        string.append(originalText);
+        string.append("\n"); 
+        
+//        string.append("QuestionType: " + questionType + "\n");
         string.append("AnswerType: " + answerType + "\n");
-        string.append("Focus: " + focus + "\n");
+        
+        string.append("Focus: ");
+        for (FocusType word : focusTypes) {
+            string.append(word + ", ");
+        }
+        string.append("\n");
+        
+        string.append("Main Objects: ");
+        for (String word : mainObjects) {
+            string.append(word + ", ");
+        }
+        string.append("\n");
+
         string.append("Keywords: ");
-        for(String word : keywords)
+        if(keywords != null)
         {
-            string.append(word + " ");
+            for(String word : keywords)
+            {
+                string.append(word + ", ");
+            }
         }
         
         string.append("\n");
         return string.toString();
     }
+
+    
 }
+
+
