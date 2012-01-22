@@ -144,6 +144,7 @@ public class Parser {
 
         
         Pattern novelP = Pattern.compile("the? novel");
+        Pattern personP = Pattern.compile("(the)?\\s*(([A-Z]\\w+\\s*)+)");
 //        Pattern mainCharP = Pattern.compile("");
         
         Pattern p = Pattern.compile("^What (is|are) ");
@@ -164,6 +165,20 @@ public class Parser {
                 outputQuestion.addFocusType(FocusType.NOVEL);
                 question = question.replace(m2.group(0), "");
             }
+            else
+            {
+                m2 = personP.matcher(question);
+                if (m2.find(m.end())) {
+                    if(m.group(1) != null)
+                        outputQuestion.addFocusType(FocusType.OBJECT);
+                    else
+                        outputQuestion.addFocusType(FocusType.PERSON);
+                    outputQuestion.addMainObject(m2.group(2)); 
+                    question = question.replace(m2.group(0), "");
+                }
+            }
+
+            
             
             question = question.replace(m.group(0), ""); 
             
@@ -174,14 +189,15 @@ public class Parser {
         }
         else
         {
-            p = Pattern.compile("^What (does|did|do)?");
+            p = Pattern.compile("^What (\\w+) (is|are) ");
             m = p.matcher(question);
             if (m.find()) {
                 outputQuestion.setAnswerType(AnswerType.EXPLANATION);
-                if (m.group(1) != null) {
-                    if (m.group(1).toUpperCase().equals("IS")) {
+
+                if (m.group(2) != null) {
+                    if (m.group(2).toUpperCase().equals("IS")) {
                         outputQuestion.setMulitplicity(Multiplicity.MULTIPLE);
-                    } else if (m.group(1).toUpperCase().equals("ARE")) {
+                    } else if (m.group(2).toUpperCase().equals("ARE")) {
                         outputQuestion.setMulitplicity(Multiplicity.SINGLE);
                     }
                 }
@@ -192,7 +208,62 @@ public class Parser {
                     outputQuestion.addFocusType(FocusType.NOVEL);
                     question = question.replace(m2.group(0), "");
                 }
-                question = question.replace(m.group(0), "");
+                else {
+                    m2 = personP.matcher(question);
+                    if (m2.find(m.end())) {
+                        if (m.group(1) != null) {
+                            outputQuestion.addFocusType(FocusType.OBJECT);
+                        } else {
+                            outputQuestion.addFocusType(FocusType.PERSON);
+                        }
+                        outputQuestion.addMainObject(m2.group(2));
+                        question = question.replace(m2.group(0), "");
+                    }
+                }
+
+                //retaining word
+                question = m.group(1) + " " + question.replace(m.group(0), "");
+            }
+            else
+            {
+                p = Pattern.compile("^What (does|did|do)?");
+                m = p.matcher(question);
+                if (m.find()) {
+//                    outputQuestion.setAnswerType(AnswerType.EXPLANATION);
+                    if (m.group(1) != null) {
+                        outputQuestion.setAnswerType(AnswerType.EXPLANATION);
+
+//                        if (m.group(1).toUpperCase().equals("IS")) {
+//                            outputQuestion.setMulitplicity(Multiplicity.MULTIPLE);
+//                        } else if (m.group(1).toUpperCase().equals("ARE")) {
+//                            outputQuestion.setMulitplicity(Multiplicity.SINGLE);
+//                        }
+                    }
+                    else
+                        outputQuestion.setAnswerType(AnswerType.OBJECT);
+
+
+
+                    Matcher m2 = novelP.matcher(question);
+                    if (m2.find(m.end())) {
+                        outputQuestion.addFocusType(FocusType.NOVEL);
+                        question = question.replace(m2.group(0), "");
+                    }
+                    else {
+                        m2 = personP.matcher(question);
+                        if (m2.find(m.end())) {
+                            if (m.group(1) != null) {
+                                outputQuestion.addFocusType(FocusType.OBJECT);
+                            } else {
+                                outputQuestion.addFocusType(FocusType.PERSON);
+                            }
+                            outputQuestion.addMainObject(m2.group(2));
+                            question = question.replace(m2.group(0), "");
+                        }
+                    }
+
+                    question = question.replace(m.group(0), "");
+                }
             }
         }
 
@@ -214,6 +285,19 @@ public class Parser {
                 outputQuestion.addFocusType(FocusType.NOVEL);
                 question = question.replace(m2.group(0), "");
             }
+            else {
+                m2 = personP.matcher(question);
+                if (m2.find(m.end())) {
+                    if (m.group(1) != null) {
+                        outputQuestion.addFocusType(FocusType.OBJECT);
+                    } else {
+                        outputQuestion.addFocusType(FocusType.PERSON);
+                    }
+                    outputQuestion.addMainObject(m2.group(2));
+                    question = question.replace(m2.group(0), "");
+                }
+            }
+
             question = question.replace(m.group(0), "");
         }
 
@@ -235,6 +319,19 @@ public class Parser {
                 outputQuestion.addFocusType(FocusType.NOVEL);
                 question = question.replace(m2.group(0), "");
             }
+            else {
+                m2 = personP.matcher(question);
+                if (m2.find(m.end())) {
+                    if (m.group(1) != null) {
+                        outputQuestion.addFocusType(FocusType.OBJECT);
+                    } else {
+                        outputQuestion.addFocusType(FocusType.PERSON);
+                    }
+                    outputQuestion.addMainObject(m2.group(2));
+                    question = question.replace(m2.group(0), "");
+                }
+            }
+
             question = question.replace(m.group(0), "");
         }
         
@@ -257,36 +354,22 @@ public class Parser {
                 outputQuestion.addFocusType(FocusType.NOVEL);
                 question = question.replace(m2.group(0), "");
             }
-            question = question.replace(m.group(0), "");
-        }
-        
-        
-        
-        p = Pattern.compile("^What \\w+ (is|are) ");
-        m = p.matcher(question);
-        if (m.find()) {
-            outputQuestion.setAnswerType(AnswerType.PERSON);
-            
-            //TODO add word to ...
-            
-            if (m.group(1) != null) {
-                if (m.group(1).toUpperCase().equals("IS")) {
-                    outputQuestion.setMulitplicity(Multiplicity.MULTIPLE);
-                } else if (m.group(1).toUpperCase().equals("ARE")) {
-                    outputQuestion.setMulitplicity(Multiplicity.SINGLE);
+            else {
+                m2 = personP.matcher(question);
+                if (m2.find(m.end())) {
+                    if (m.group(1) != null) {
+                        outputQuestion.addFocusType(FocusType.OBJECT);
+                    } else {
+                        outputQuestion.addFocusType(FocusType.PERSON);
+                    }
+                    outputQuestion.addMainObject(m2.group(2));
+                    question = question.replace(m2.group(0), "");
                 }
             }
-            
-            
-            Matcher m2 = novelP.matcher(question);
-            if (m2.find(m.end())) {
-                outputQuestion.addFocusType(FocusType.NOVEL);
-                question = question.replace(m2.group(0), "");
-            }
+
             question = question.replace(m.group(0), "");
         }
         
-
         p = Pattern.compile("^How (does|did|do|is|are) ");
         m = p.matcher(question);
         if (m.find()) {
@@ -308,6 +391,19 @@ public class Parser {
                 outputQuestion.addFocusType(FocusType.NOVEL);
                 question = question.replace(m2.group(0), "");
             }
+            else {
+                m2 = personP.matcher(question);
+                if (m2.find(m.end())) {
+                    if (m.group(1) != null) {
+                        outputQuestion.addFocusType(FocusType.OBJECT);
+                    } else {
+                        outputQuestion.addFocusType(FocusType.PERSON);
+                    }
+                    outputQuestion.addMainObject(m2.group(2));
+                    question = question.replace(m2.group(0), "");
+                }
+            }
+
             question = question.replace(m.group(0), "");
         }
         
@@ -343,7 +439,7 @@ public class Parser {
         question = question.replaceAll("[\\?,.!]", " ");
 
         //Filtering
-        question = question.trim().replaceAll("\\W(the|&|or|and)\\W", " ");
+        question = question.trim().replaceAll("(^|\\W)(the|&|or|and)(\\W|$)", " ");
         
         if(question.equals(""))
         {

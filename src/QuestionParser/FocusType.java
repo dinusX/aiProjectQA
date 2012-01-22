@@ -11,5 +11,6 @@ package QuestionParser;
 public enum FocusType {
     NOVEL,
     PERSON,
-    RELATION
+    RELATION,
+    OBJECT
 }

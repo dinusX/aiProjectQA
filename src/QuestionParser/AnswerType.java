@@ -15,5 +15,6 @@ public enum AnswerType {
     LOCATION,
     TIME,
     MODALITY,
-    EXPLANATION
+    EXPLANATION,
+    OBJECT
 }
