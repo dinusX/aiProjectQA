@@ -7,7 +7,9 @@ package QuestionParser;
 import com.sun.org.apache.xerces.internal.impl.xpath.regex.Match;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
@@ -337,12 +339,73 @@ public class Parser {
     
     public static void setKeywords(Question outputQuestion, String question)
     {
+        
         question = question.replaceAll("[\\?,.!]", " ");
 
         //Filtering
-        question = question.replaceAll("(the|&|or|and)", " ");
+        question = question.trim().replaceAll("\\W(the|&|or|and)\\W", " ");
+        
+        if(question.equals(""))
+        {
+            outputQuestion.setKeywords(new String[0]);
+            return;
+        }
         
         String[] words = question.split("\\s+");
+        int[] join = new int[words.length];
+        Arrays.fill(join, -1);
+//        int counter = 0;
+        boolean joined = false;
+        
+//        for(String word : words)
+        String word, nextWord;
+        for(int i=0; i< words.length; i++)
+        {
+            word = words[i];
+           if(wordType != null && wordType.containsKey(word) &&
+               wordType.get(word) == 'J') //Adjective
+           {
+               //and next is noun or unknown join
+               
+               if(i+1<words.length )
+               {
+                   nextWord = words[i+1];
+                   if (!wordType.containsKey(nextWord) || wordType.get(nextWord) == 'N')
+                   {
+                       joined = true;
+//                       counter++;
+//                       join[i] = counter;
+                       join[i+1] = i;
+                       i++;
+                   }
+               }
+           }
+        }
+        
+        
+        
+        if(joined)
+        {
+            String[] outputWords = new String[words.length-1];
+            int counter = 0;
+//            int n = words.length;
+            for(int i=0; i< words.length; i++)
+            {
+                if(join[i] < 0)
+                {
+                    outputWords[i - counter] = words[i];
+                }
+                else
+                {
+                    outputWords[join[i]-counter] += " " + words[i];
+                    counter++;
+                }
+            }
+            words = outputWords;
+        }
+        
+        
+        
 //        words = filterWords(words);
         outputQuestion.setKeywords(words);
     }
@@ -391,7 +454,7 @@ public class Parser {
 //        //TODO continue parsing
 //    }
     
-    static HashMap<String, Character> wordType = null;
+    static HashMap<String, Character> wordType;
     private static void loadKeywords()
     {
         if(wordType != null)
@@ -400,20 +463,22 @@ public class Parser {
         Scanner scanner = null;
         String last = "";
         char type= 'A';
+        Pattern r = Pattern.compile("\"(\\w+)\"");
+        Matcher m = null;
+        int end = 0;
         try {
             scanner = new Scanner(new FileInputStream("./lemmeEN.txt"));
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
 
-                Pattern r = Pattern.compile("\"(\\w)+\"");
-                Matcher m = r.matcher(line);
+                m = r.matcher(line);
 
-                int end = 0;
+                end = 0;
                 
                 type = line.charAt(0);
-                while (m.find(end) && !m.group(0).equals(last)) {
-                    last = m.group(0);
-                    wordType.put(m.group(0), type);
+                while (m.find(end) && !m.group(1).equals(last)) {
+                    last = m.group(1);
+                    wordType.put(m.group(1), type);
                     end = m.end();
                 }
             }
