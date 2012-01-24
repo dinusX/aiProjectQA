@@ -169,11 +169,12 @@ public class Parser {
 //                    question = question.replace(m.group(start + 1), "");
                 } else 
                 if (m.group(start+2) != null) {
-                    if (m.group(start + 3) != null) {
-                        outputQuestion.addFocusType(FocusType.OBJECT);
-                    } else {
-                        outputQuestion.addFocusType(FocusType.PERSON);
-                    }
+//                    if (m.group(start + 3) != null) {
+                    outputQuestion.addFocusType(FocusType.OBJECT);
+//                    } else {
+//                        outputQuestion.addFocusType(FocusType.PERSON);
+//                    }
+
                     outputQuestion.addMainObject(m.group(start + 4));
 //                    question = question.replace(m2.group(0), "");
                 }
@@ -230,11 +231,12 @@ public class Parser {
                         outputQuestion.addFocusType(FocusType.NOVEL);
 //                    question = question.replace(m.group(start + 1), "");
                     } else if (m.group(start + 2) != null) {
-                        if (m.group(start + 3) != null) {
-                            outputQuestion.addFocusType(FocusType.OBJECT);
-                        } else {
-                            outputQuestion.addFocusType(FocusType.PERSON);
-                        }
+//                    if (m.group(start + 3) != null) {
+                        outputQuestion.addFocusType(FocusType.OBJECT);
+//                    } else {
+//                        outputQuestion.addFocusType(FocusType.PERSON);
+//                    }
+
                         outputQuestion.addMainObject(m.group(start + 4));
 //                    question = question.replace(m2.group(0), "");
                     }
@@ -244,7 +246,7 @@ public class Parser {
             }
             else
             {
-                p = Pattern.compile("^What ((does|did|do)|(\\w+)) " + additionalP );
+                p = Pattern.compile("^What ((does|did|do)|(\\w+))(\\W|$)" + additionalP );
                 m = p.matcher(question);
                 if (m.find()) {
 //                    outputQuestion.setAnswerType(AnswerType.EXPLANATION);
@@ -258,21 +260,28 @@ public class Parser {
 //                        }
                     }
                     else
-                        outputQuestion.setAnswerType(AnswerType.OBJECT);
+                        outputQuestion.setAnswerType(AnswerType.EVENT);
                         
 
 
 
-                    int start = 4;
+                    int start = 5;
                     if (m.groupCount() >= start && m.group(start) != null) {
                         if (m.group(start + 1) != null) {
                             outputQuestion.addFocusType(FocusType.NOVEL);
                         } else if (m.group(start + 2) != null) {
-                            if (m.group(start + 3) != null) {
-                                outputQuestion.addFocusType(FocusType.OBJECT);
-                            } else {
-                                outputQuestion.addFocusType(FocusType.PERSON);
-                            }
+//                    if (m.group(start + 3) != null) {
+//                            outputQuestion.addFocusType(FocusType.OBJECT);
+//                    } else {
+//                        outputQuestion.addFocusType(FocusType.PERSON);
+//                    }
+
+//                    if (outputQuestion.getAnswerType() == AnswerType.DEFINITION) { //What does ???
+//                            outputQuestion.addFocusType(FocusType.PERSON);
+//                    } else {
+                        outputQuestion.addFocusType(FocusType.OBJECT);
+//                    }
+
                             outputQuestion.addMainObject(m.group(start + 4));
                         }
                     }
@@ -284,7 +293,7 @@ public class Parser {
             }
         }
 
-        p = Pattern.compile("^Who ((is|are)|(\\w+)) " + additionalP);
+        p = Pattern.compile("^Who ((is|are)|(\\w+))(\\W|$)" + additionalP);
         m = p.matcher(question);
         if (m.find()) {
             outputQuestion.setAnswerType(AnswerType.PERSON);
@@ -299,19 +308,25 @@ public class Parser {
 //            FocusType defaultFocus = FocusType.PERSON;
 //            if(m.group(3))
                 
-            int start = 4;
+            int start = 5;
             if (m.groupCount() >= start && m.group(start) != null) {
                 if (m.group(start + 1) != null) {
                     outputQuestion.addFocusType(FocusType.NOVEL);
                 } else if (m.group(start + 2) != null) {
                     //Becouse we find name 
                     if(m.group(2) != null) //other verb
+//                    {
                         outputQuestion.setAnswerType(AnswerType.DEFINITION);
-                    if (m.group(start + 3) != null) {
+//                        outputQuestion.addFocusType(FocusType.PERSON);
+//                    }
+//                    else
                         outputQuestion.addFocusType(FocusType.OBJECT);
-                    } else {
-                        outputQuestion.addFocusType(FocusType.PERSON);
-                    }
+//                    if (m.group(start + 3) != null) {
+//                    outputQuestion.addFocusType(FocusType.OBJECT);
+//                    } else {
+//                        outputQuestion.addFocusType(FocusType.PERSON);
+//                    }
+
                     outputQuestion.addMainObject(m.group(start + 4));
                 }
             }
@@ -340,11 +355,14 @@ public class Parser {
                 if (m.group(start + 1) != null) {
                     outputQuestion.addFocusType(FocusType.NOVEL);
                 } else if (m.group(start + 2) != null) {
-                    if (m.group(start + 3) != null) {
-                        outputQuestion.addFocusType(FocusType.OBJECT);
-                    } else {
-                        outputQuestion.addFocusType(FocusType.PERSON);
-                    }
+                    
+//                    if (m.group(start + 3) != null) {
+                    outputQuestion.addFocusType(FocusType.OBJECT);
+//                    } else {
+//                        outputQuestion.addFocusType(FocusType.PERSON);
+//                    }
+
+                    
                     outputQuestion.addMainObject(m.group(start + 4));
                 }
             }
@@ -352,7 +370,7 @@ public class Parser {
             question = question.replace(m.group(0), "");
         }
         
-        p = Pattern.compile("^When ((does|did|do|is|are)|(\\w+))" + additionalP);
+        p = Pattern.compile("^When ((does|did|do|is|are)|(\\w+)) " + additionalP);
         m = p.matcher(question);
         if (m.find()) {
             outputQuestion.setAnswerType(AnswerType.TIME);
@@ -371,11 +389,11 @@ public class Parser {
                 if (m.group(start + 1) != null) {
                     outputQuestion.addFocusType(FocusType.NOVEL);
                 } else if (m.group(start + 2) != null) {
-                    if (m.group(start + 3) != null) {
+//                    if (m.group(start + 3) != null) {
                         outputQuestion.addFocusType(FocusType.OBJECT);
-                    } else {
-                        outputQuestion.addFocusType(FocusType.PERSON);
-                    }
+//                    } else {
+//                        outputQuestion.addFocusType(FocusType.PERSON);
+//                    }
                     outputQuestion.addMainObject(m.group(start + 4));
                 }
             }
@@ -383,32 +401,33 @@ public class Parser {
             question = question.replace(m.group(0), "");
         }
         
-        p = Pattern.compile("^How (does|did|do|is|are) " + additionalP);
+        p = Pattern.compile("^How ((does|did|do|is|are)|(\\w+)) " + additionalP);
         m = p.matcher(question);
         if (m.find()) {
             outputQuestion.setAnswerType(AnswerType.MODALITY);
 
             //TODO add word to ...
 
-            if (m.group(1) != null) {
-                if (m.group(1).toUpperCase().equals("IS")) {
+            if (m.group(2) != null) {
+                if (m.group(2).toUpperCase().equals("IS")) {
                     outputQuestion.setMulitplicity(Multiplicity.MULTIPLE);
-                } else if (m.group(1).toUpperCase().equals("ARE")) {
+                } else if (m.group(2).toUpperCase().equals("ARE")) {
                     outputQuestion.setMulitplicity(Multiplicity.SINGLE);
                 }
             }
 
 
-            int start = 2;
+            int start = 4;
             if (m.groupCount() >= start && m.group(start) != null) {
                 if (m.group(start + 1) != null) {
                     outputQuestion.addFocusType(FocusType.NOVEL);
                 } else if (m.group(start + 2) != null) {
-                    if (m.group(start + 3) != null) {
-                        outputQuestion.addFocusType(FocusType.OBJECT);
-                    } else {
-                        outputQuestion.addFocusType(FocusType.PERSON);
-                    }
+//                    if (m.group(start + 3) != null) {
+                    outputQuestion.addFocusType(FocusType.OBJECT);
+//                    } else {
+//                        outputQuestion.addFocusType(FocusType.PERSON);
+//                    }
+
                     outputQuestion.addMainObject(m.group(start + 4));
                 }
             }
@@ -458,13 +477,17 @@ public class Parser {
         
         String[] words = question.split("\\s+");
         int[] join = new int[words.length];
+        boolean[] remove = new boolean[words.length];
         Arrays.fill(join, -1);
+        Arrays.fill(remove, false);
+        
 //        int counter = 0;
-        boolean joined = false;
+        int joined = 0;
+        int removed = 0;
         
 //        for(String word : words)
         String word, nextWord;
-        for(int i=0; i< words.length; i++)
+        for(int i=0; i< words.length-1; i++)
         {
             word = words[i];
            if(wordType != null && wordType.containsKey(word) &&
@@ -472,12 +495,12 @@ public class Parser {
            {
                //and next is noun or unknown join
                
-               if(i+1<words.length )
+               if(i+1<words.length ) 
                {
                    nextWord = words[i+1];
                    if (!wordType.containsKey(nextWord) || wordType.get(nextWord) == 'N')
                    {
-                       joined = true;
+                       joined++;
 //                       counter++;
 //                       join[i] = counter;
                        join[i+1] = i;
@@ -485,17 +508,33 @@ public class Parser {
                    }
                }
            }
+           
+            if (wordType != null && words[i].toUpperCase().equals("TO")) //Adjective
+            {
+
+                nextWord = words[i + 1];
+                if (!wordType.containsKey(nextWord) || wordType.get(nextWord) == 'V') {
+                    removed++;
+                    remove[i] = true;
+                }
+            }
         }
         
         
         
-        if(joined)
+        if(joined + removed > 0)
         {
-            String[] outputWords = new String[words.length-1];
+            String[] outputWords = new String[words.length-joined - removed];
             int counter = 0;
 //            int n = words.length;
             for(int i=0; i< words.length; i++)
             {
+                if(remove[i])
+                {
+                    counter++;
+                    continue;
+                }
+                
                 if(join[i] < 0)
                 {
                     outputWords[i - counter] = words[i];
@@ -583,7 +622,8 @@ public class Parser {
                 type = line.charAt(0);
                 while (m.find(end) && !m.group(1).equals(last)) {
                     last = m.group(1);
-                    wordType.put(m.group(1), type);
+                    if(wordType.containsKey(m.group(1)))
+                        wordType.put(m.group(1), type);
                     end = m.end();
                 }
             }

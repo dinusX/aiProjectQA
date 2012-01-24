@@ -16,5 +16,6 @@ public enum AnswerType {
     TIME,
     MODALITY,
     EXPLANATION,
+    EVENT,
     OBJECT
 }

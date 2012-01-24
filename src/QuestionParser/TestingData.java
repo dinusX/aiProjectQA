@@ -71,7 +71,7 @@ public class TestingData {
         "How does it begin?",
         "Who is Myrtle Wilson?",
         "Who is Myrtle Wilson to George Wilson?",
-        "Wher does Myrtle Wilson live?",
+        "Where does Myrtle Wilson live?",
         "What happened in 1917?",
         "Who allows Daisy to ride with Gatsby?",
         "Who is married to George Wilson?",

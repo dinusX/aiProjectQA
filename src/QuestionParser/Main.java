@@ -34,7 +34,7 @@ public class Main {
 
 //        System.out.println("out: " + Pattern.compile("What is?").matcher("What ").matches());
         
-        String[] questions = TestingData.getMainQuestions();
+        String[] questions = TestingData.getMainQuestions(1);
         for(String question2 : questions)
         {
             Question parsedQuestion = Parser.parse(question2);
