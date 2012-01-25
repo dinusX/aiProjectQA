@@ -4,6 +4,7 @@
  */
 package QuestionParser;
 
+import main.Main;
 import com.sun.org.apache.xerces.internal.impl.xpath.regex.Match;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
