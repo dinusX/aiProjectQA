@@ -24,9 +24,29 @@ public class Question
     private ArrayList<FocusType> focusTypes = new ArrayList<FocusType>();
     private ArrayList<String> mainObjects = new ArrayList<String>();
 
+    private ArrayList<String> dates = new ArrayList<String>();
     
     public void addMainObject(String mainObject) {
         this.mainObjects.add(mainObject);
+    }
+    
+    public String[] getMainObjects()
+    {
+        return (String[])mainObjects.toArray();
+    }
+    
+    public String[] getDates() {
+        return (String[]) dates.toArray();
+    }
+    
+    public boolean hasMainObjects()
+    {
+        return mainObjects.size() > 0;
+    }
+    
+    public boolean hasDates()
+    {
+        return dates.size() > 0;
     }
 
 //    public ArrayList<String> getMainWords() {
@@ -35,6 +55,11 @@ public class Question
     
     public void addFocusType(FocusType focus) {
         focusTypes.add(focus);
+    }
+    
+    public boolean containsFocusType(FocusType focus)
+    {
+        return focusTypes.contains(focus);
     }
     
 //    private String focus = "";
@@ -64,6 +89,12 @@ public class Question
         this.originalText = originalText;
     }
 
+    public void addDate(String date)
+    {
+        dates.add(date);
+    }
+    
+    
 //    public void setQuestionType(String questionType) {
 //        this.questionType = questionType;
 //    }
@@ -115,7 +146,7 @@ public class Question
             string.append(word + ", ");
         }
         string.append("\n");
-        string.append(multiplicity.toString() + "\n");
+        string.append("Multiplicity: " + multiplicity.toString() + "\n");
         
         string.append("Main Objects: ");
         for (String word : mainObjects) {
@@ -123,6 +154,12 @@ public class Question
         }
         string.append("\n");
 
+        string.append("Dates: ");
+        for (String word : dates) {
+            string.append(word + ", ");
+        }
+        string.append("\n");
+        
         string.append("Keywords: ");
         if(keywords != null)
         {

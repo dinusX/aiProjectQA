@@ -286,6 +286,39 @@ public class Parser {
                         }
                     }
 
+                    //TODO parse for all questions.
+                    
+//                    String year = "(^|\\D)\\d{4}[^\\d]";
+//            String month = "\\d\\d[^0-9]";
+//            String day = "\\d\\d[^0-9]";
+                    String longMonth = "(January|February|March|April|May|June|July|August|September|October|November|December)";
+//                    String twoDigitMult = "([^|\\D]\\d{2}[^\\d])+";
+//                    String or = "|";
+//                    String sep = "[-,/ ]*";
+                    String x = "";
+//                            "(" + twoDigitMult + "(th)?(\\s+of)?" + sep + ")?" + longMonth + //28th of December
+//                            "(" + sep + twoDigitMult + ")?" + "(" + sep + year + ")?" + //28 2003
+//                            "(" + sep + twoDigitMult + ")?" + or + //30
+//                            "(" + twoDigitMult + sep + ")?" + year + "(" + sep + twoDigitMult + ")?"; //date,month,year or year,month,date
+//                    System.out.println("string: (" + x + ")");
+
+                    //in on
+                    x = "(^|\\W)" + 
+                        "((in|on|year|month)?" +
+                        "(([-,/ ^]\\d{1,2}){0,2}[-,/ ]\\d{4}" + "|"+
+                        "([-,/ ]\\d{1,2})?(th)?(\\s+of)?" + longMonth + "([-,/ ]+\\d{0,2})?" + "([-,/ ]+\\d{4})?" + "))\\D" ;
+
+//                    System.out.println("string: (" + x + ")");
+
+                    Pattern dateP = Pattern.compile(x);
+                    Matcher dateM = dateP.matcher(question);
+                    if (dateM.find()) {
+                        outputQuestion.setAnswerType(AnswerType.EVENT);
+                        outputQuestion.addDate(dateM.group(4));
+                        question = question.replace(dateM.group(2), "");
+                    }
+                    
+                    
                     question = question.replace(m.group(0), "");
                     if(m.group(3) != null)
                         question = m.group(3) + " " + question;
@@ -330,7 +363,7 @@ public class Parser {
                     outputQuestion.addMainObject(m.group(start + 4));
                 }
             }
-
+            
             question = question.replace(m.group(0), "");
             if (m.group(3) != null) {
                 question = m.group(3) + " " + question;
@@ -463,11 +496,16 @@ public class Parser {
     
     public static void setKeywords(Question outputQuestion, String question)
     {
+        ///(January|February|March|April|May|June|July|August|September|October|November|December) \d\d, \d\d\d\d/i';
+        //(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)
         
         question = question.replaceAll("[\\?,.!]", " ");
 
         //Filtering
         question = question.trim().replaceAll("(^|\\W)(the|&|or|and)(\\W|$)", " ");
+        
+
+        
         
         if(question.equals(""))
         {
@@ -553,6 +591,23 @@ public class Parser {
 //        words = filterWords(words);
         outputQuestion.setKeywords(words);
     }
+    
+//    public void parseDates(Question outputQuestion, String question)
+//    {
+//        String year = "[-,/ ]+\\d\\d\\d\\d";
+//        String month = "[-,/ ]+\\d\\d[^0-9]";
+//        String day = "[-,/ ]+\\d\\d[^0-9]";
+//        String longMonth = "[-,/ ]+(January|February|March|April|May|June|July|August|September|October|November|December)";
+//        String twoDigitMult = "([-,/ ]+\\d\\d[^0-9])*";
+//        String or = "|";
+//        String x = twoDigitMult +"(th)?(\\s+of)?" + longMonth + twoDigitMult + year +"?" + twoDigitMult + or + twoDigitMult + year + twoDigitMult;
+//        Pattern p = Pattern.compile("(" + x + ")");
+//        Matcher m = p.matcher(question);
+//        if (m.find()) {
+//            outputQuestion.addDate(m.group(0));
+//            question = question.replace(m.group(0), "");
+//        }
+//    }
     
     
 //    public void findKeywords(Question question)

@@ -29,7 +29,7 @@ public class Main {
     public static void main(String[] args){
   
         //Parsing Main Questions
-            String[] questions = TestingData.getMainQuestions();
+            String[] questions = TestingData.getMainQuestions(1);
             for(String question : questions)
             {
                 Question parsedQuestion = Parser.parse(MainKnowledge.checkAndCorrect(question));
