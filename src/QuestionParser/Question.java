@@ -115,6 +115,7 @@ public class Question
             string.append(word + ", ");
         }
         string.append("\n");
+        string.append(multiplicity.toString() + "\n");
         
         string.append("Main Objects: ");
         for (String word : mainObjects) {

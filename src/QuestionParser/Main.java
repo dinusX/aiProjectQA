@@ -4,8 +4,11 @@
  */
 package QuestionParser;
 
+import com.softcorporation.suggester.tools.SpellCheck;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.Scanner;
 import java.util.logging.Level;
@@ -24,22 +27,43 @@ public class Main {
     
     
     public static void main(String[] args){
-        // TODO code application logic here
-//        Parser parser = new Parser();
-//        Question question = parser.Parse("What's your name?");
-//
-//        System.out.println("Question Type: " + question.getQuestionType());
-//        System.out.println("Answer Type: " + question.getAnswerType());
+  
+        //Parsing Main Questions
+            String[] questions = TestingData.getMainQuestions();
+            for(String question : questions)
+            {
+                Question parsedQuestion = Parser.parse(MainKnowledge.checkAndCorrect(question));
+                System.out.println("Out: " + parsedQuestion);
+            }
 
+    
 
-//        System.out.println("out: " + Pattern.compile("What is?").matcher("What ").matches());
         
-        String[] questions = TestingData.getMainQuestions(1);
-        for(String question2 : questions)
-        {
-            Question parsedQuestion = Parser.parse(question2);
-            System.out.println("Out: " + parsedQuestion);
-        }
+        
+        
+        
+        
+        //Examples: (Nu sterge)
+        
+//          Correcting spelling errors
+//        String response = MainKnowledge.checkAndCorrect("Wher are you from?"); 
+//        System.out.println("Response: " + response);
+        
+        
+        
+        //Search Wikipedia
+//        try {
+//            String y = MainKnowledge.getWiki("A Christmas Carol");
+//            System.out.println("received: " + y);
+//        } catch (MalformedURLException ex) {
+//            System.err.println("Error wiki");
+//        } catch (IOException ex) {
+//            System.err.println("Error wiki");
+//        }
+
+        
+        
+        
     }
 }
 
