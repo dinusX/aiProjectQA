@@ -24,10 +24,7 @@ import java.util.regex.Pattern;
  */
 public class Parser {
 
-    static 
-    {
-        loadKeywords();
-    }
+
 
 
 //persoane, numere, masuri, locatii, timp, organizatii, obiecte
@@ -528,15 +525,14 @@ public class Parser {
         for(int i=0; i< words.length-1; i++)
         {
             word = words[i];
-           if(wordType != null && wordType.containsKey(word) &&
-               wordType.get(word) == 'J') //Adjective
+           if(Lemmatizer.containsType(word) && Lemmatizer.getType(word) == 'J') //Adjective
            {
                //and next is noun or unknown join
                
                if(i+1<words.length ) 
                {
                    nextWord = words[i+1];
-                   if (!wordType.containsKey(nextWord) || wordType.get(nextWord) == 'N')
+                   if (!Lemmatizer.containsType(nextWord) || Lemmatizer.getType(nextWord) == 'N')
                    {
                        joined++;
 //                       counter++;
@@ -547,11 +543,11 @@ public class Parser {
                }
            }
            
-            if (wordType != null && words[i].toUpperCase().equals("TO")) //Adjective
+            if (words[i].toUpperCase().equals("TO")) //Adjective
             {
 
                 nextWord = words[i + 1];
-                if (!wordType.containsKey(nextWord) || wordType.get(nextWord) == 'V') {
+                if (!Lemmatizer.containsType(nextWord) || Lemmatizer.getType(nextWord) == 'V') {
                     removed++;
                     remove[i] = true;
                 }
@@ -653,43 +649,7 @@ public class Parser {
 //        //TODO continue parsing
 //    }
     
-    static HashMap<String, Character> wordType;
-    private static void loadKeywords()
-    {
-        if(wordType != null)
-            return;
-        wordType = new HashMap<String, Character>();
-        Scanner scanner = null;
-        String last = "";
-        char type= 'A';
-        Pattern r = Pattern.compile("\"(\\w+)\"");
-        Matcher m = null;
-        int end = 0;
-        try {
-            scanner = new Scanner(new FileInputStream("./lemmeEN.txt"));
-            while (scanner.hasNextLine()) {
-                String line = scanner.nextLine();
-
-                m = r.matcher(line);
-
-                end = 0;
-                
-                type = line.charAt(0);
-                while (m.find(end) && !m.group(1).equals(last)) {
-                    last = m.group(1);
-                    if(wordType.containsKey(m.group(1)))
-                        wordType.put(m.group(1), type);
-                    end = m.end();
-                }
-            }
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            if (scanner != null) {
-                scanner.close();
-            }
-        }
-    }
+    
 }
 
 
