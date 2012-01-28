@@ -12,5 +12,8 @@ public enum FocusType {
     NOVEL,
     PERSON,
     RELATION,
-    OBJECT
+    OBJECT,
+    OCCUPATION,
+    MAIN_CHARACTER
+    
 }
