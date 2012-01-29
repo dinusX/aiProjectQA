@@ -163,11 +163,7 @@ public class Parser {
         if (m.find()) {
             outputQuestion.setAnswerType(AnswerType.DEFINITION);
             if (m.group(1) != null) {
-                if (m.group(1).toUpperCase().equals("IS")) {
-                    outputQuestion.setMulitplicity(Multiplicity.MULTIPLE);
-                } else if (m.group(1).toUpperCase().equals("ARE")) {
-                    outputQuestion.setMulitplicity(Multiplicity.SINGLE);
-                }
+                setMultiplicity(outputQuestion,m.group(1));
             }
             
             int start = 2;
@@ -226,11 +222,7 @@ public class Parser {
                 outputQuestion.setAnswerType(AnswerType.DEFINITION);
 
                 if (m.group(2) != null) {
-                    if (m.group(2).toUpperCase().equals("IS")) {
-                        outputQuestion.setMulitplicity(Multiplicity.MULTIPLE);
-                    } else if (m.group(2).toUpperCase().equals("ARE")) {
-                        outputQuestion.setMulitplicity(Multiplicity.SINGLE);
-                    }
+                    setMultiplicity(outputQuestion, m.group(2));
                 }
 
 
@@ -262,6 +254,7 @@ public class Parser {
                     if (m.group(2) != null) {
                         outputQuestion.setAnswerType(AnswerType.DEFINITION);
 
+                        setMultiplicity(outputQuestion, m.group(2));
 //                        if (m.group(1).toUpperCase().equals("IS")) {
 //                            outputQuestion.setMulitplicity(Multiplicity.MULTIPLE);
 //                        } else if (m.group(1).toUpperCase().equals("ARE")) {
@@ -295,39 +288,6 @@ public class Parser {
                         }
                     }
 
-                    //TODO parse for all questions.
-                    
-//                    String year = "(^|\\D)\\d{4}[^\\d]";
-//            String month = "\\d\\d[^0-9]";
-//            String day = "\\d\\d[^0-9]";
-                    String longMonth = "(January|February|March|April|May|June|July|August|September|October|November|December)";
-//                    String twoDigitMult = "([^|\\D]\\d{2}[^\\d])+";
-//                    String or = "|";
-//                    String sep = "[-,/ ]*";
-                    String x = "";
-//                            "(" + twoDigitMult + "(th)?(\\s+of)?" + sep + ")?" + longMonth + //28th of December
-//                            "(" + sep + twoDigitMult + ")?" + "(" + sep + year + ")?" + //28 2003
-//                            "(" + sep + twoDigitMult + ")?" + or + //30
-//                            "(" + twoDigitMult + sep + ")?" + year + "(" + sep + twoDigitMult + ")?"; //date,month,year or year,month,date
-//                    System.out.println("string: (" + x + ")");
-
-                    //in on
-                    x = "(^|\\W)" + 
-                        "((in|on|year|month)?" +
-                        "(([-,/ ^]\\d{1,2}){0,2}[-,/ ]\\d{4}" + "|"+
-                        "([-,/ ]\\d{1,2})?(th)?(\\s+of)?" + longMonth + "([-,/ ]+\\d{0,2})?" + "([-,/ ]+\\d{4})?" + "))\\D" ;
-
-//                    System.out.println("string: (" + x + ")");
-
-                    Pattern dateP = Pattern.compile(x);
-                    Matcher dateM = dateP.matcher(question);
-                    if (dateM.find()) {
-                        outputQuestion.setAnswerType(AnswerType.EVENT);
-                        outputQuestion.addDate(dateM.group(4));
-                        question = question.replace(dateM.group(2), "");
-                    }
-                    
-                    
                     question = question.replace(m.group(0), "");
                     if(m.group(3) != null)
                         question = m.group(3) + " " + question;
@@ -350,11 +310,7 @@ public class Parser {
         if (m.find()) {
             outputQuestion.setAnswerType(AnswerType.PERSON);
             if (m.group(2) != null) {
-                if (m.group(1).toUpperCase().equals("IS")) {
-                    outputQuestion.setMulitplicity(Multiplicity.SINGLE);
-                } else if (m.group(1).toUpperCase().equals("ARE")) {
-                    outputQuestion.setMulitplicity(Multiplicity.MULTIPLE);
-                }
+                setMultiplicity(outputQuestion, m.group(2));
             }
             
 //            FocusType defaultFocus = FocusType.PERSON;
@@ -394,11 +350,7 @@ public class Parser {
         if (m.find()) {
             outputQuestion.setAnswerType(AnswerType.LOCATION);
             if (m.group(2) != null) {
-                if (m.group(2).toUpperCase().equals("IS")) {
-                    outputQuestion.setMulitplicity(Multiplicity.SINGLE);
-                } else if (m.group(2).toUpperCase().equals("ARE")) {
-                    outputQuestion.setMulitplicity(Multiplicity.MULTIPLE);
-                }
+                setMultiplicity(outputQuestion, m.group(2));
             }
             
             
@@ -428,11 +380,7 @@ public class Parser {
             outputQuestion.setAnswerType(AnswerType.TIME);
             if(m.group(2) != null)
             {
-                if (m.group(2).toUpperCase().equals("IS")) {
-                    outputQuestion.setMulitplicity(Multiplicity.SINGLE);
-                } else if (m.group(2).toUpperCase().equals("ARE")) {
-                    outputQuestion.setMulitplicity(Multiplicity.MULTIPLE);
-                }
+                setMultiplicity(outputQuestion, m.group(2));
             }
             
             
@@ -461,11 +409,7 @@ public class Parser {
             //TODO add word to ...
 
             if (m.group(2) != null) {
-                if (m.group(2).toUpperCase().equals("IS")) {
-                    outputQuestion.setMulitplicity(Multiplicity.SINGLE);
-                } else if (m.group(2).toUpperCase().equals("ARE")) {
-                    outputQuestion.setMulitplicity(Multiplicity.MULTIPLE);
-                }
+                setMultiplicity(outputQuestion, m.group(2));
             }
 
 
@@ -527,12 +471,46 @@ public class Parser {
             outputQuestion.addFocusType(FocusType.MAIN_CHARACTER);
             question = question.replaceAll("main\\s+characters?", "");
         }
+        
+        Pattern ansP = Pattern.compile("((takes?|took)\\s+place|occur(s|ed)?|happen(s|ed)?)");
+        Matcher mAns = ansP.matcher(question);
+        
+//        if((outputQuestion.getAnswerType() == AnswerType.LOCATION || outputQuestion.getAnswerType() == AnswerType.TIME)
+//                && mAns.find())
+        if (mAns.find())
+        {
+            question = question.replace(mAns.group(), "");
+        }
+        
+        question = question.trim();
+        
+        if(!outputQuestion.containsMainObjects() && question.trim().startsWith("it"))
+        {
+            outputQuestion.addFocusType(FocusType.NOVEL);
+            question = question.substring(2);
+        }
        
+        String output = parseTime(outputQuestion, question);
+        if (output != null) {
+            question = output;
+        }
+
         setKeywords(outputQuestion, question);
 
         return outputQuestion;
     }
     
+    
+    public static void setMultiplicity(Question outputQuestion, String verb)
+    {
+        verb = verb.toLowerCase();
+        if (verb.equals("is") || verb.equals("does") ) {
+            outputQuestion.setMulitplicity(Multiplicity.SINGLE);
+        } else  { //if (verb.equals("are"))
+            outputQuestion.setMulitplicity(Multiplicity.MULTIPLE);
+        }
+
+    }
     public static void setKeywords(Question outputQuestion, String question)
     {
         ///(January|February|March|April|May|June|July|August|September|October|November|December) \d\d, \d\d\d\d/i';
@@ -638,9 +616,53 @@ public class Parser {
         }
         
         
-        
 //        words = filterWords(words);
         outputQuestion.setKeywords(words);
+    }
+    
+    public static String parseTime(Question outputQuestion, String text)
+    {
+        text = " " + text + " "; // temporary fix for problem
+        //TODO parse for all questions.
+
+//            String year = "(^|\\D)\\d{4}[^\\d]";
+//            String month = "\\d\\d[^0-9]";
+//            String day = "\\d\\d[^0-9]";
+        String longMonth = "(January|February|March|April|May|June|July|August|September|October|November|December)";
+//                    String twoDigitMult = "([^|\\D]\\d{2}[^\\d])+";
+//                    String or = "|";
+//                    String sep = "[-,/ ]*";
+//        String x = "";
+//                            "(" + twoDigitMult + "(th)?(\\s+of)?" + sep + ")?" + longMonth + //28th of December
+//                            "(" + sep + twoDigitMult + ")?" + "(" + sep + year + ")?" + //28 2003
+//                            "(" + sep + twoDigitMult + ")?" + or + //30
+//                            "(" + twoDigitMult + sep + ")?" + year + "(" + sep + twoDigitMult + ")?"; //date,month,year or year,month,date
+//                    System.out.println("string: (" + x + ")");
+
+        //in on
+        String x = "(^|\\W)"
+                + "((in|on|year|month)?"
+                + "(([-,/ ^]\\d{1,2}){0,2}[-,/ ]\\d{4}" + "|"
+                + "([-,/ ]\\d{1,2})?(th)?(\\s+of)?" + longMonth + "([-,/ ]+\\d{0,2})?" + "([-,/ ]+\\d{4})?" + "))\\D";
+
+//                    System.out.println("string: (" + x + ")");
+
+        boolean found = false;
+        Pattern dateP = Pattern.compile(x);
+        Matcher dateM = dateP.matcher(text);
+        while (dateM.find()) {
+            outputQuestion.addDate(dateM.group(4));
+            text = text.replace(dateM.group(2), "");
+            found = true;
+        }
+        
+        if(found)
+        {
+            if(outputQuestion.getAnswerType() == AnswerType.DEFINITION)
+                outputQuestion.setAnswerType(AnswerType.EVENT);
+            return text;
+        }
+        return null;
     }
     
 //    public void parseDates(Question outputQuestion, String question)
@@ -661,50 +683,6 @@ public class Parser {
 //    }
     
     
-//    public void findKeywords(Question question)
-//    {
-//        ArrayList list = new ArrayList();
-//        
-//        String text = question.getOriginalText();
-//        Pattern r = Pattern.compile("([\"\'](\\w)+[\"\'])|(\\s(([A-Z]\\w+\\s*)+))");
-//        Matcher m = r.matcher(text);
-//        int end = 0;
-//        while (m.find(end)) {
-////            System.out.println("2: " + m.group(2));
-////            System.out.println("4: " + m.group(4));
-//            
-////            if(m.group(2) != null)
-////                question.addFocus(m.group(2).trim());  //TODO changed
-////            else
-////                question.addFocus(m.group(4).trim());
-////            end = m.end();
-//        }
-//        //TODO if not found focus set first noun.
-//        
-////        r = Pattern.compile("Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday|January|February|March|April|June|July|August|September|October|November|December");
-////        m = r.matcher(text);
-////        end = 0;
-////        while (m.find(end)) {
-//////            System.out.println("Zorro: " + m.group(0));
-////            list.add(m.group(0)); //emphisize words
-////            end = m.end();
-////        }
-//        
-////        System.out.println("words count: " + text.split(" ").length);
-//        
-//        
-//        text = text.replaceAll("[\\?,.!]", text);
-//        
-//        String[] words = text.split("\\s+");
-//        
-//        //TODO filter words
-//        
-//        question.setKeywords(words);
-//        
-//        //TODO continue parsing
-//    }
-    
-
     static HashMap<String, ArrayList> phrasalVerbs;
 
     static void loadPhrasalVerbs() throws IOException

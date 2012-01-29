@@ -126,7 +126,45 @@ public class Question
     public Multiplicity getMulitplicity() {
         return this.multiplicity;
     }
+
+    public ArrayList<String> getVerbs()
+    {
+        return getVerbs(true);
+    }
+    
+    public ArrayList<String> getVerbs(boolean includePhrasalVerbs)
+    {
+        ArrayList<String> result = new ArrayList<String>();
+        
+        for(String word : keywords)
+        {
+            if(word.contains(" "))
+            {
+                if(includePhrasalVerbs)
+                    result.add(word);
+                else
+                    result.add(word.split(" ")[0]);
+                            
+            }
+            else
+            if(Lemmatizer.containsType(word) && Lemmatizer.getType(word) == 'V')
+            {
+                result.add(word);
+            }
+            
+        }
+        
+        return result;
+    }
+    
+    public boolean containsMainObjects()
+    {
+        return mainObjects.size() > 0;
+    }
    
+    public boolean containsDates() {
+        return dates.size() > 0;
+    }
     
     @Override
     public String toString()
@@ -163,6 +201,14 @@ public class Question
         {
             for(String word : keywords)
             {
+                string.append(word + ", ");
+            }
+        }
+        string.append("\n");
+        string.append("Verbs: ");
+        ArrayList<String> verbs = getVerbs();
+        if (verbs != null) {
+            for (String word : verbs) {
                 string.append(word + ", ");
             }
         }
