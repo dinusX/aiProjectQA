@@ -1,2 +1,0 @@
-QuestionParser.Parser
-QuestionParser.Question

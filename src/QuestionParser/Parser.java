@@ -4,16 +4,14 @@
  */
 package QuestionParser;
 
-import Main.Main;
-import com.sun.org.apache.xerces.internal.impl.xpath.regex.Match;
+import java.io.BufferedReader;
+import java.io.DataInputStream;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.lang.reflect.Array;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -27,7 +25,12 @@ public class Parser {
 
     static 
     {
-        loadKeywords();
+        phrasalVerbs = new HashMap<String, ArrayList>();
+        try {
+            loadPhrasalVerbs();
+        } catch (IOException ex) {
+            Logger.getLogger(Parser.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
 
@@ -85,7 +88,12 @@ public class Parser {
     
     public static Question parse(String question)
     {
+        
         Question outputQuestion = new Question(question);
+        
+        question = question.replaceAll("[\\?,.!:]", " ");
+        question = question.replaceFirst("in\\s+the\\s+novel", ""); 
+
 //
 //        Match match = new Match();
 //        Pattern r = Pattern.compile(a_types[0][0]);
@@ -262,8 +270,8 @@ public class Parser {
                     }
                     else
                         outputQuestion.setAnswerType(AnswerType.EVENT);
-                        
-
+                     //TODO maybe change to situation   
+//TOOD change spaces to \\s
 
 
                     int start = 5;
@@ -287,9 +295,52 @@ public class Parser {
                         }
                     }
 
+                    //TODO parse for all questions.
+                    
+//                    String year = "(^|\\D)\\d{4}[^\\d]";
+//            String month = "\\d\\d[^0-9]";
+//            String day = "\\d\\d[^0-9]";
+                    String longMonth = "(January|February|March|April|May|June|July|August|September|October|November|December)";
+//                    String twoDigitMult = "([^|\\D]\\d{2}[^\\d])+";
+//                    String or = "|";
+//                    String sep = "[-,/ ]*";
+                    String x = "";
+//                            "(" + twoDigitMult + "(th)?(\\s+of)?" + sep + ")?" + longMonth + //28th of December
+//                            "(" + sep + twoDigitMult + ")?" + "(" + sep + year + ")?" + //28 2003
+//                            "(" + sep + twoDigitMult + ")?" + or + //30
+//                            "(" + twoDigitMult + sep + ")?" + year + "(" + sep + twoDigitMult + ")?"; //date,month,year or year,month,date
+//                    System.out.println("string: (" + x + ")");
+
+                    //in on
+                    x = "(^|\\W)" + 
+                        "((in|on|year|month)?" +
+                        "(([-,/ ^]\\d{1,2}){0,2}[-,/ ]\\d{4}" + "|"+
+                        "([-,/ ]\\d{1,2})?(th)?(\\s+of)?" + longMonth + "([-,/ ]+\\d{0,2})?" + "([-,/ ]+\\d{4})?" + "))\\D" ;
+
+//                    System.out.println("string: (" + x + ")");
+
+                    Pattern dateP = Pattern.compile(x);
+                    Matcher dateM = dateP.matcher(question);
+                    if (dateM.find()) {
+                        outputQuestion.setAnswerType(AnswerType.EVENT);
+                        outputQuestion.addDate(dateM.group(4));
+                        question = question.replace(dateM.group(2), "");
+                    }
+                    
+                    
                     question = question.replace(m.group(0), "");
                     if(m.group(3) != null)
                         question = m.group(3) + " " + question;
+                    else
+                    {
+                        if(m.group(2) != null && ((question.trim().length() > 2 &&question.trim().startsWith("do ")) || 
+                                (question.trim().length() == 2 && question.trim().startsWith("do"))))
+                        {
+                            //What does he do
+                            outputQuestion.addFocusType(FocusType.OCCUPATION);
+                            question = question.replaceFirst("^\\s*do", "");
+                        }
+                    }
                 }
             }
         }
@@ -300,9 +351,9 @@ public class Parser {
             outputQuestion.setAnswerType(AnswerType.PERSON);
             if (m.group(2) != null) {
                 if (m.group(1).toUpperCase().equals("IS")) {
-                    outputQuestion.setMulitplicity(Multiplicity.MULTIPLE);
-                } else if (m.group(1).toUpperCase().equals("ARE")) {
                     outputQuestion.setMulitplicity(Multiplicity.SINGLE);
+                } else if (m.group(1).toUpperCase().equals("ARE")) {
+                    outputQuestion.setMulitplicity(Multiplicity.MULTIPLE);
                 }
             }
             
@@ -331,7 +382,7 @@ public class Parser {
                     outputQuestion.addMainObject(m.group(start + 4));
                 }
             }
-
+            
             question = question.replace(m.group(0), "");
             if (m.group(3) != null) {
                 question = m.group(3) + " " + question;
@@ -344,9 +395,9 @@ public class Parser {
             outputQuestion.setAnswerType(AnswerType.LOCATION);
             if (m.group(2) != null) {
                 if (m.group(2).toUpperCase().equals("IS")) {
-                    outputQuestion.setMulitplicity(Multiplicity.MULTIPLE);
-                } else if (m.group(2).toUpperCase().equals("ARE")) {
                     outputQuestion.setMulitplicity(Multiplicity.SINGLE);
+                } else if (m.group(2).toUpperCase().equals("ARE")) {
+                    outputQuestion.setMulitplicity(Multiplicity.MULTIPLE);
                 }
             }
             
@@ -378,9 +429,9 @@ public class Parser {
             if(m.group(2) != null)
             {
                 if (m.group(2).toUpperCase().equals("IS")) {
-                    outputQuestion.setMulitplicity(Multiplicity.MULTIPLE);
-                } else if (m.group(2).toUpperCase().equals("ARE")) {
                     outputQuestion.setMulitplicity(Multiplicity.SINGLE);
+                } else if (m.group(2).toUpperCase().equals("ARE")) {
+                    outputQuestion.setMulitplicity(Multiplicity.MULTIPLE);
                 }
             }
             
@@ -411,9 +462,9 @@ public class Parser {
 
             if (m.group(2) != null) {
                 if (m.group(2).toUpperCase().equals("IS")) {
-                    outputQuestion.setMulitplicity(Multiplicity.MULTIPLE);
-                } else if (m.group(2).toUpperCase().equals("ARE")) {
                     outputQuestion.setMulitplicity(Multiplicity.SINGLE);
+                } else if (m.group(2).toUpperCase().equals("ARE")) {
+                    outputQuestion.setMulitplicity(Multiplicity.MULTIPLE);
                 }
             }
 
@@ -454,21 +505,44 @@ public class Parser {
             }
             end = m.end();
         }
+       
         
+        if((outputQuestion.getAnswerType() == AnswerType.DEFINITION || outputQuestion.getAnswerType() == AnswerType.PERSON) && 
+                ((question.trim().length() > 2 && question.trim().startsWith("to ")) || (question.trim().length() == 2 && question.trim().startsWith("to"))))
+        {
+//            System.out.println("z: " + ((outputQuestion.getAnswerType() == AnswerType.DEFINITION || outputQuestion.getAnswerType() == AnswerType.PERSON) &&
+//                    question.trim().length() >= 3 && question.trim().startsWith("to ")));
+            outputQuestion.addFocusType(FocusType.RELATION);
+//            question = question.replace("\\s*to", "");
+            question = question.replaceFirst("^\\s*to", "");
+        }
+        
+        if(question.contains("relationship")|| question.contains("relation"))
+        {
+            outputQuestion.addFocusType(FocusType.RELATION);
+            question = question.replaceAll("(relationship|relation)s?", "");
+        }
+        
+        if (question.contains("main character")) {
+            outputQuestion.addFocusType(FocusType.MAIN_CHARACTER);
+            question = question.replaceAll("main\\s+characters?", "");
+        }
        
         setKeywords(outputQuestion, question);
 
-        
         return outputQuestion;
     }
     
     public static void setKeywords(Question outputQuestion, String question)
     {
+        ///(January|February|March|April|May|June|July|August|September|October|November|December) \d\d, \d\d\d\d/i';
+        //(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)
         
-        question = question.replaceAll("[\\?,.!]", " ");
-
         //Filtering
         question = question.trim().replaceAll("(^|\\W)(the|&|or|and)(\\W|$)", " ");
+        
+
+        
         
         if(question.equals(""))
         {
@@ -476,7 +550,8 @@ public class Parser {
             return;
         }
         
-        String[] words = question.split("\\s+");
+//        String[] words = question.split("\\s+");
+        String[] words = Lemmatizer.lemmatize(question.split("\\s+"));
         int[] join = new int[words.length];
         boolean[] remove = new boolean[words.length];
         Arrays.fill(join, -1);
@@ -491,15 +566,14 @@ public class Parser {
         for(int i=0; i< words.length-1; i++)
         {
             word = words[i];
-           if(wordType != null && wordType.containsKey(word) &&
-               wordType.get(word) == 'J') //Adjective
+           if(Lemmatizer.containsType(word) && Lemmatizer.getType(word) == 'J') //Adjective
            {
                //and next is noun or unknown join
                
                if(i+1<words.length ) 
                {
                    nextWord = words[i+1];
-                   if (!wordType.containsKey(nextWord) || wordType.get(nextWord) == 'N')
+                   if (!Lemmatizer.containsType(nextWord) || Lemmatizer.getType(nextWord) == 'N')
                    {
                        joined++;
 //                       counter++;
@@ -509,12 +583,26 @@ public class Parser {
                    }
                }
            }
+
            
-            if (wordType != null && words[i].toUpperCase().equals("TO")) //Adjective
+           if (phrasalVerbs.containsKey(word))
+           {
+               nextWord = words[i + 1];
+               if(phrasalVerbs.get(word).contains(nextWord))
+               {
+                   joined++;
+                   join[i+1]=i;
+                   i++;
+               }
+           }
+               
+           
+           
+            if (words[i].toUpperCase().equals("TO")) //Adjective
             {
 
                 nextWord = words[i + 1];
-                if (!wordType.containsKey(nextWord) || wordType.get(nextWord) == 'V') {
+                if (!Lemmatizer.containsType(nextWord) || Lemmatizer.getType(nextWord) == 'V') {
                     removed++;
                     remove[i] = true;
                 }
@@ -554,6 +642,23 @@ public class Parser {
 //        words = filterWords(words);
         outputQuestion.setKeywords(words);
     }
+    
+//    public void parseDates(Question outputQuestion, String question)
+//    {
+//        String year = "[-,/ ]+\\d\\d\\d\\d";
+//        String month = "[-,/ ]+\\d\\d[^0-9]";
+//        String day = "[-,/ ]+\\d\\d[^0-9]";
+//        String longMonth = "[-,/ ]+(January|February|March|April|May|June|July|August|September|October|November|December)";
+//        String twoDigitMult = "([-,/ ]+\\d\\d[^0-9])*";
+//        String or = "|";
+//        String x = twoDigitMult +"(th)?(\\s+of)?" + longMonth + twoDigitMult + year +"?" + twoDigitMult + or + twoDigitMult + year + twoDigitMult;
+//        Pattern p = Pattern.compile("(" + x + ")");
+//        Matcher m = p.matcher(question);
+//        if (m.find()) {
+//            outputQuestion.addDate(m.group(0));
+//            question = question.replace(m.group(0), "");
+//        }
+//    }
     
     
 //    public void findKeywords(Question question)
@@ -599,43 +704,66 @@ public class Parser {
 //        //TODO continue parsing
 //    }
     
-    static HashMap<String, Character> wordType;
-    private static void loadKeywords()
+
+    static HashMap<String, ArrayList> phrasalVerbs;
+
+    static void loadPhrasalVerbs() throws IOException
     {
-        if(wordType != null)
-            return;
-        wordType = new HashMap<String, Character>();
-        Scanner scanner = null;
-        String last = "";
-        char type= 'A';
-        Pattern r = Pattern.compile("\"(\\w+)\"");
-        Matcher m = null;
-        int end = 0;
+        String prevVerb = null; //valoare care retine verbul de pe linia precedenta din fisier
+        String rest = new String(); //String care retine prepozitiile/adverbele care alcatuiesc PV-urile impreuna cu verbul
+        ArrayList<String> restList = new ArrayList<String>(); //lista care retine toate prep./adverbele care alcatuiesc PV-uri cu verbul
+        //cerem un verb pentru a testa functionalitatea programului
+
         try {
-            scanner = new Scanner(new FileInputStream("./lemmeEN.txt"));
-            while (scanner.hasNextLine()) {
-                String line = scanner.nextLine();
-
-                m = r.matcher(line);
-
-                end = 0;
-                
-                type = line.charAt(0);
-                while (m.find(end) && !m.group(1).equals(last)) {
-                    last = m.group(1);
-                    if(wordType.containsKey(m.group(1)))
-                        wordType.put(m.group(1), type);
-                    end = m.end();
+            //deschidem fisierul
+            FileInputStream fstream = new FileInputStream("./phrasal_verbs.txt");
+            DataInputStream in = new DataInputStream(fstream);
+            BufferedReader br = new BufferedReader(new InputStreamReader(in));
+            String strLine;
+            //citim fisierul linie cu linie
+            while ((strLine = br.readLine()) != null) {
+                //despartim liniile fisierelor in string-uri
+                String[] result = strLine.trim().split("\\s+");
+                //daca suntem la primul verb din fisier, il setam ca prevVerb
+                if (prevVerb == null) {
+                    prevVerb = result[0];
                 }
+                //daca suntem la acelasi verb ca in linia precedenta, adaugam la restList prep./adverbul de dupa verb
+                if (result[0].equals(prevVerb)) {
+                    rest = result[1];
+                    for (int x = 2; x < result.length; x++) {
+                        rest = rest + " " + result[x].toLowerCase();
+                    }
+                    restList.add(rest);
+                }
+                //daca avem un verb diferit fata de cel de la linia precedenta,
+                //golim restList, setam prevVerb ca verbul curent si adaugam
+                //prep./adverbul de dupa acesta in restList
+                else 
+                {
+                    phrasalVerbs.put(prevVerb.toLowerCase(), restList);
+                    restList = new ArrayList<String>();
+                    prevVerb = result[0];
+                    rest = result[1];
+                    for (int x = 2; x < result.length; x++) {
+                        rest = rest + " " + result[x].toLowerCase();
+                    }
+                    restList.add(rest);
+                }
+                //adaugam in HashMap lista prep./adverbelor pentru verbul curent
+                
+                rest = "";
             }
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            if (scanner != null) {
-                scanner.close();
-            }
+            if(restList.size() > 0)
+                phrasalVerbs.put(prevVerb.toLowerCase(), restList);
+            
+            in.close();
+        } catch (Exception e) {
+            //Catch exception if any
+            System.err.println("Error: " + e.getMessage());
         }
     }
+    
 }
 
 

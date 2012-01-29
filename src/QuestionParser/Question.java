@@ -6,6 +6,8 @@
 package QuestionParser;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 
 /**
  *
@@ -24,17 +26,38 @@ public class Question
     private ArrayList<FocusType> focusTypes = new ArrayList<FocusType>();
     private ArrayList<String> mainObjects = new ArrayList<String>();
 
+    private ArrayList<String> dates = new ArrayList<String>();
     
     public void addMainObject(String mainObject) {
         this.mainObjects.add(mainObject);
     }
-
-    public ArrayList<String> getMainObjects() {
-        return this.mainObjects;
+    
+    public ArrayList<String> getMainObjects()
+    {
+        return mainObjects;
+    }
+    
+    public ArrayList<String> getDates() {
+        return dates;
+    }
+    
+    public boolean hasMainObjects()
+    {
+        return mainObjects.size() > 0;
+    }
+    
+    public boolean hasDates()
+    {
+        return dates.size() > 0;
     }
     
     public void addFocusType(FocusType focus) {
         focusTypes.add(focus);
+    }
+    
+    public boolean containsFocusType(FocusType focus)
+    {
+        return focusTypes.contains(focus);
     }
     
 //    private String focus = "";
@@ -64,6 +87,12 @@ public class Question
         this.originalText = originalText;
     }
 
+    public void addDate(String date)
+    {
+        dates.add(date);
+    }
+    
+    
 //    public void setQuestionType(String questionType) {
 //        this.questionType = questionType;
 //    }
@@ -76,8 +105,8 @@ public class Question
 //        return focus;
 //    }
 
-    public String[] getKeywords() {
-        return keywords;
+    public ArrayList<String> getKeywords() {
+        return new ArrayList<String>(Arrays.asList(this.keywords));
     }
 
 //    public void setKeywords(ArrayList keywords) {
@@ -115,6 +144,7 @@ public class Question
             string.append(word + ", ");
         }
         string.append("\n");
+        string.append("Multiplicity: " + multiplicity.toString() + "\n");
         
         string.append("Main Objects: ");
         for (String word : mainObjects) {
@@ -122,6 +152,12 @@ public class Question
         }
         string.append("\n");
 
+        string.append("Dates: ");
+        for (String word : dates) {
+            string.append(word + ", ");
+        }
+        string.append("\n");
+        
         string.append("Keywords: ");
         if(keywords != null)
         {
