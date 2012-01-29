@@ -29,9 +29,9 @@ public class Question
         this.mainObjects.add(mainObject);
     }
 
-//    public ArrayList<String> getMainWords() {
-//        return mainWords;
-//    }
+    public ArrayList<String> getMainObjects() {
+        return this.mainObjects;
+    }
     
     public void addFocusType(FocusType focus) {
         focusTypes.add(focus);
