@@ -300,39 +300,6 @@ public class Parser {
                         }
                     }
 
-                    //TODO parse for all questions.
-                    
-//                    String year = "(^|\\D)\\d{4}[^\\d]";
-//            String month = "\\d\\d[^0-9]";
-//            String day = "\\d\\d[^0-9]";
-                    String longMonth = "(January|February|March|April|May|June|July|August|September|October|November|December)";
-//                    String twoDigitMult = "([^|\\D]\\d{2}[^\\d])+";
-//                    String or = "|";
-//                    String sep = "[-,/ ]*";
-                    String x = "";
-//                            "(" + twoDigitMult + "(th)?(\\s+of)?" + sep + ")?" + longMonth + //28th of December
-//                            "(" + sep + twoDigitMult + ")?" + "(" + sep + year + ")?" + //28 2003
-//                            "(" + sep + twoDigitMult + ")?" + or + //30
-//                            "(" + twoDigitMult + sep + ")?" + year + "(" + sep + twoDigitMult + ")?"; //date,month,year or year,month,date
-//                    System.out.println("string: (" + x + ")");
-
-                    //in on
-                    x = "(^|\\W)" + 
-                        "((in|on|year|month)?" +
-                        "(([-,/ ^]\\d{1,2}){0,2}[-,/ ]\\d{4}" + "|"+
-                        "([-,/ ]\\d{1,2})?(th)?(\\s+of)?" + longMonth + "([-,/ ]+\\d{0,2})?" + "([-,/ ]+\\d{4})?" + "))\\D" ;
-
-//                    System.out.println("string: (" + x + ")");
-
-                    Pattern dateP = Pattern.compile(x);
-                    Matcher dateM = dateP.matcher(question);
-                    if (dateM.find()) {
-                        outputQuestion.setAnswerType(AnswerType.EVENT);
-                        outputQuestion.addDate(dateM.group(4));
-                        question = question.replace(dateM.group(2), "");
-                    }
-                    
-                    
                     question = question.replace(m.group(0), "");
                     if(m.group(3) != null)
                         question = m.group(3) + " " + question;
@@ -533,6 +500,11 @@ public class Parser {
             question = question.replaceAll("main\\s+characters?", "");
         }
        
+        String output = parseTime(outputQuestion, question);
+        if (output != null) {
+            question = output;
+        }
+
         setKeywords(outputQuestion, question);
 
         return outputQuestion;
@@ -643,9 +615,52 @@ public class Parser {
         }
         
         
-        
 //        words = filterWords(words);
         outputQuestion.setKeywords(words);
+    }
+    
+    public static String parseTime(Question outputQuestion, String text)
+    {
+        //TODO parse for all questions.
+
+//            String year = "(^|\\D)\\d{4}[^\\d]";
+//            String month = "\\d\\d[^0-9]";
+//            String day = "\\d\\d[^0-9]";
+        String longMonth = "(January|February|March|April|May|June|July|August|September|October|November|December)";
+//                    String twoDigitMult = "([^|\\D]\\d{2}[^\\d])+";
+//                    String or = "|";
+//                    String sep = "[-,/ ]*";
+//        String x = "";
+//                            "(" + twoDigitMult + "(th)?(\\s+of)?" + sep + ")?" + longMonth + //28th of December
+//                            "(" + sep + twoDigitMult + ")?" + "(" + sep + year + ")?" + //28 2003
+//                            "(" + sep + twoDigitMult + ")?" + or + //30
+//                            "(" + twoDigitMult + sep + ")?" + year + "(" + sep + twoDigitMult + ")?"; //date,month,year or year,month,date
+//                    System.out.println("string: (" + x + ")");
+
+        //in on
+        String x = "(^|\\W)"
+                + "((in|on|year|month)?"
+                + "(([-,/ ^]\\d{1,2}){0,2}[-,/ ]\\d{4}" + "|"
+                + "([-,/ ]\\d{1,2})?(th)?(\\s+of)?" + longMonth + "([-,/ ]+\\d{0,2})?" + "([-,/ ]+\\d{4})?" + "))\\D";
+
+//                    System.out.println("string: (" + x + ")");
+
+        boolean found = false;
+        Pattern dateP = Pattern.compile(x);
+        Matcher dateM = dateP.matcher(text);
+        while (dateM.find()) {
+            outputQuestion.addDate(dateM.group(4));
+            text = text.replace(dateM.group(2), "");
+            found = true;
+        }
+        
+        if(found)
+        {
+//            if(outputQuestion.getAnswerType() == AnswerType.)
+            outputQuestion.setAnswerType(AnswerType.EVENT);
+            return text;
+        }
+        return null;
     }
     
 //    public void parseDates(Question outputQuestion, String question)

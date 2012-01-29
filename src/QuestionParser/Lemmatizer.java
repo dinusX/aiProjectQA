@@ -170,7 +170,7 @@ public class Lemmatizer {
         
         ArrayList<WordChange> changes = new ArrayList();
 //        Pair<int,int> pair = new Pair<int,int>();
-        Pattern p = Pattern.compile("(^|[^a-zA-Z])([a-zA-Z]+)[^a-zA-Z]");
+        Pattern p = Pattern.compile("(^|[^a-zA-Z])([a-zA-Z]+)([^a-zA-Z]|$)");
         Matcher m = p.matcher(text);
         
         String word = "";

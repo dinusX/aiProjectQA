@@ -29,12 +29,14 @@ public class Main {
     
     public static void main(String[] args){
             //Parsing Main Questions
-    //            String[] questions = TestingData.getMainQuestions();
-    //            for(String question : questions)
-    //            {
-    //                Question parsedQuestion = Parser.parse(question);
-    //                System.out.println("Out: " + parsedQuestion);
-    //            }
+                String[] questions = TestingData.getMainQuestions(1);
+                for(String question : questions)
+                {
+                    Question parsedQuestion = Parser.parse(question);
+                    System.out.println("Out: " + parsedQuestion);
+                }
+                
+//                System.out.println(Lemmatizer.lemmatize("asked"));
 
 
         //Server
