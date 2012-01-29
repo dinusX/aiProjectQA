@@ -66,7 +66,7 @@ public class Lemmatizer {
                 type = line.charAt(0);
                 while (m.find(end) && !m.group(1).equals(last)) {
                     last = m.group(1);
-                    if (wordTypes.containsKey(m.group(1))) {
+                    if (!wordTypes.containsKey(m.group(1))) {
                         wordTypes.put(m.group(1), type);
                     }
                     if(end==0)

@@ -168,11 +168,7 @@ public class Parser {
         if (m.find()) {
             outputQuestion.setAnswerType(AnswerType.DEFINITION);
             if (m.group(1) != null) {
-                if (m.group(1).toUpperCase().equals("IS")) {
-                    outputQuestion.setMulitplicity(Multiplicity.MULTIPLE);
-                } else if (m.group(1).toUpperCase().equals("ARE")) {
-                    outputQuestion.setMulitplicity(Multiplicity.SINGLE);
-                }
+                setMultiplicity(outputQuestion,m.group(1));
             }
             
             int start = 2;
@@ -231,11 +227,7 @@ public class Parser {
                 outputQuestion.setAnswerType(AnswerType.DEFINITION);
 
                 if (m.group(2) != null) {
-                    if (m.group(2).toUpperCase().equals("IS")) {
-                        outputQuestion.setMulitplicity(Multiplicity.MULTIPLE);
-                    } else if (m.group(2).toUpperCase().equals("ARE")) {
-                        outputQuestion.setMulitplicity(Multiplicity.SINGLE);
-                    }
+                    setMultiplicity(outputQuestion, m.group(2));
                 }
 
 
@@ -267,6 +259,7 @@ public class Parser {
                     if (m.group(2) != null) {
                         outputQuestion.setAnswerType(AnswerType.DEFINITION);
 
+                        setMultiplicity(outputQuestion, m.group(2));
 //                        if (m.group(1).toUpperCase().equals("IS")) {
 //                            outputQuestion.setMulitplicity(Multiplicity.MULTIPLE);
 //                        } else if (m.group(1).toUpperCase().equals("ARE")) {
@@ -322,11 +315,7 @@ public class Parser {
         if (m.find()) {
             outputQuestion.setAnswerType(AnswerType.PERSON);
             if (m.group(2) != null) {
-                if (m.group(1).toUpperCase().equals("IS")) {
-                    outputQuestion.setMulitplicity(Multiplicity.SINGLE);
-                } else if (m.group(1).toUpperCase().equals("ARE")) {
-                    outputQuestion.setMulitplicity(Multiplicity.MULTIPLE);
-                }
+                setMultiplicity(outputQuestion, m.group(2));
             }
             
 //            FocusType defaultFocus = FocusType.PERSON;
@@ -366,11 +355,7 @@ public class Parser {
         if (m.find()) {
             outputQuestion.setAnswerType(AnswerType.LOCATION);
             if (m.group(2) != null) {
-                if (m.group(2).toUpperCase().equals("IS")) {
-                    outputQuestion.setMulitplicity(Multiplicity.SINGLE);
-                } else if (m.group(2).toUpperCase().equals("ARE")) {
-                    outputQuestion.setMulitplicity(Multiplicity.MULTIPLE);
-                }
+                setMultiplicity(outputQuestion, m.group(2));
             }
             
             
@@ -400,11 +385,7 @@ public class Parser {
             outputQuestion.setAnswerType(AnswerType.TIME);
             if(m.group(2) != null)
             {
-                if (m.group(2).toUpperCase().equals("IS")) {
-                    outputQuestion.setMulitplicity(Multiplicity.SINGLE);
-                } else if (m.group(2).toUpperCase().equals("ARE")) {
-                    outputQuestion.setMulitplicity(Multiplicity.MULTIPLE);
-                }
+                setMultiplicity(outputQuestion, m.group(2));
             }
             
             
@@ -433,11 +414,7 @@ public class Parser {
             //TODO add word to ...
 
             if (m.group(2) != null) {
-                if (m.group(2).toUpperCase().equals("IS")) {
-                    outputQuestion.setMulitplicity(Multiplicity.SINGLE);
-                } else if (m.group(2).toUpperCase().equals("ARE")) {
-                    outputQuestion.setMulitplicity(Multiplicity.MULTIPLE);
-                }
+                setMultiplicity(outputQuestion, m.group(2));
             }
 
 
@@ -499,6 +476,24 @@ public class Parser {
             outputQuestion.addFocusType(FocusType.MAIN_CHARACTER);
             question = question.replaceAll("main\\s+characters?", "");
         }
+        
+        Pattern ansP = Pattern.compile("((takes?|took)\\s+place|occur(s|ed)?|happen(s|ed)?)");
+        Matcher mAns = ansP.matcher(question);
+        
+//        if((outputQuestion.getAnswerType() == AnswerType.LOCATION || outputQuestion.getAnswerType() == AnswerType.TIME)
+//                && mAns.find())
+        if (mAns.find())
+        {
+            question = question.replace(mAns.group(), "");
+        }
+        
+        question = question.trim();
+        
+        if(!outputQuestion.containsMainObjects() && question.trim().startsWith("it"))
+        {
+            outputQuestion.addFocusType(FocusType.NOVEL);
+            question = question.substring(2);
+        }
        
         String output = parseTime(outputQuestion, question);
         if (output != null) {
@@ -510,6 +505,17 @@ public class Parser {
         return outputQuestion;
     }
     
+    
+    public static void setMultiplicity(Question outputQuestion, String verb)
+    {
+        verb = verb.toLowerCase();
+        if (verb.equals("is") || verb.equals("does") ) {
+            outputQuestion.setMulitplicity(Multiplicity.SINGLE);
+        } else  { //if (verb.equals("are"))
+            outputQuestion.setMulitplicity(Multiplicity.MULTIPLE);
+        }
+
+    }
     public static void setKeywords(Question outputQuestion, String question)
     {
         ///(January|February|March|April|May|June|July|August|September|October|November|December) \d\d, \d\d\d\d/i';
@@ -621,6 +627,7 @@ public class Parser {
     
     public static String parseTime(Question outputQuestion, String text)
     {
+        text = " " + text + " "; // temporary fix for problem
         //TODO parse for all questions.
 
 //            String year = "(^|\\D)\\d{4}[^\\d]";
@@ -656,8 +663,8 @@ public class Parser {
         
         if(found)
         {
-//            if(outputQuestion.getAnswerType() == AnswerType.)
-            outputQuestion.setAnswerType(AnswerType.EVENT);
+            if(outputQuestion.getAnswerType() == AnswerType.DEFINITION)
+                outputQuestion.setAnswerType(AnswerType.EVENT);
             return text;
         }
         return null;
@@ -681,50 +688,6 @@ public class Parser {
 //    }
     
     
-//    public void findKeywords(Question question)
-//    {
-//        ArrayList list = new ArrayList();
-//        
-//        String text = question.getOriginalText();
-//        Pattern r = Pattern.compile("([\"\'](\\w)+[\"\'])|(\\s(([A-Z]\\w+\\s*)+))");
-//        Matcher m = r.matcher(text);
-//        int end = 0;
-//        while (m.find(end)) {
-////            System.out.println("2: " + m.group(2));
-////            System.out.println("4: " + m.group(4));
-//            
-////            if(m.group(2) != null)
-////                question.addFocus(m.group(2).trim());  //TODO changed
-////            else
-////                question.addFocus(m.group(4).trim());
-////            end = m.end();
-//        }
-//        //TODO if not found focus set first noun.
-//        
-////        r = Pattern.compile("Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday|January|February|March|April|June|July|August|September|October|November|December");
-////        m = r.matcher(text);
-////        end = 0;
-////        while (m.find(end)) {
-//////            System.out.println("Zorro: " + m.group(0));
-////            list.add(m.group(0)); //emphisize words
-////            end = m.end();
-////        }
-//        
-////        System.out.println("words count: " + text.split(" ").length);
-//        
-//        
-//        text = text.replaceAll("[\\?,.!]", text);
-//        
-//        String[] words = text.split("\\s+");
-//        
-//        //TODO filter words
-//        
-//        question.setKeywords(words);
-//        
-//        //TODO continue parsing
-//    }
-    
-
     static HashMap<String, ArrayList> phrasalVerbs;
 
     static void loadPhrasalVerbs() throws IOException
